@@ -5,7 +5,8 @@
 # @param input : 必须是已存在的目录
 # @param output : 可以是不存在的目录
 # @param suffix : 后缀，默认为[h, hpp], 后缀之间用空格隔开
-# version 0.1 : 拷贝h和hpp到指定目录
+# version 0.1 -- 2021-09-14 : 拷贝h和hpp到指定目录
+# version 0.2 -- 2021-09-15 : 新增跳过已存在的文件
 
 input=$1;
 output=$2;
@@ -30,23 +31,34 @@ function link_to_output() {
     dir=`ls $1`;
     for file in $dir;
     do
+        #判断输入文件是否为普通文件
         if [ -f $1$file ];
         then
             for suffix in ${suffix_list[@]};
             do
-                if [ "${file##*.}" == $suffix ]
+                #判断输入文件的后缀
+                if [ "${file##*.}" == $suffix ];
                 then
-                    echo "Success : Create file : '$output$file'"
-                    ln $1$file $output$file;
+                    #判断输出文件是否已存在
+                    if [ -e $output$file ];
+                    then
+                        echo -e "\e[1;33mWarning\e[0m : Skip file : '$output$file', file exist";
+                    else
+                        echo -e "\e[1;32mSuccess\e[0m : Create file : '$output$file'";
+                        ln $1$file $output$file;
+                    fi
                 fi
             done
+        #判断输入文件是否为目录
         elif [ -d $1$file ];
         then
+            #递归调用
             link_to_output $1$file/;
         fi
     done
 }
 
+#将输入路径标准化
 if [ ${input: -1} != '/' ];
 then
     input=${input}/;
@@ -57,9 +69,10 @@ then
     output=${output}/;
 fi
 
+#判断是否存在输入路径与输出路径
 if [ ! -d $input ];
 then
-    echo "Error : The $input is not a directory or no exist!";
+    echo -e "\e[1;31mError\e[0m : The $input is not a directory or no exist!";
     exit;
 fi
 
