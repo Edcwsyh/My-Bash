@@ -7,9 +7,14 @@
 
 input=$1;
 
+#本地仓库目录
 local_repo=~/.vim/bundle/YouCompleteMe
-remote_repo=https://gitee.com/edcwsyh/YouCompleteMe.git
+#远程仓库目录
+remote_repo=https://github.com/ycm-core/YouCompleteMe.git
+#临时构建目录
 build_path=/tmp/$USER/YouCompleteMe.build
+#构建模式
+build_mod=--clang-completer
 
 function install() {
     echo -e "\e[1;32mBegin\e[0m : Start the installation of 'YouCompleteMe'!";
@@ -17,22 +22,42 @@ function install() {
     then
         mkdir -p $local_repo
     fi
-    git clone $remote_repo $local_repo
-    #判断.git目录是否存在，否则表示克隆失败
-    if [ -d $local_repo/.git ]
+    if [ ! -d $local_repo/.git ]
     then
-        if [ ! -d $build_path ]
+        git clone $remote_repo $local_repo
+        if [ ! -d $local_repo/.git ]
         then
-            mkdir -p $build_path
+            echo -e "\e[1;31mError\e[0m : clone repository fail!";
+            return;
         fi
-        echo -e "\e[1;32mSuccess\e[0m : clone repository complete!";
-        git --git-dir=$local_repo/.git submodule update --init --recursive
-        python3 $local_repo/install.py --all --build-dir=$build_path
-        #删除构建目录
-        rm -rf $build_path/*
     else
-        echo -e "\e[1;31mError\e[0m : clone repository fail!";
+        is_reinput=1;
+        while [ $is_reinput == 1 ];
+        do
+            is_reinput=0;
+            echo -e "\e[1;33mWarning\e[0m : YouCompleteMe already existed! need rebuild?(Y/N):\c"; 
+            read is_rebuild;
+            case "$is_rebuild" in
+                "Y") ;; "y") ;; "yes") ;; "Yes") ;;
+                "N") return;;"n") return;;"no") return;;"No") return;;
+                *)
+                    echo -e "\e[1;31mError\e[0m : Please input yes or no !";
+                    is_reinput=1;
+        esac
+        done;
+
     fi
+    #判断.git目录是否存在，否则表示克隆失败
+    if [ ! -d $build_path ]
+    then
+        mkdir -p $build_path
+    fi
+    echo -e "\e[1;32mSuccess\e[0m : clone repository complete!";
+    cd $local_repo;
+    git submodule update --init --recursive
+    python3 $local_repo/install.py $build_mode --build-dir=$build_path
+    #删除构建目录
+    rm -rf $build_path/*
 }
 
 function update() {
@@ -45,7 +70,7 @@ function update() {
         then
             mkdir -p $build_path
         fi
-        python3 $local_repo/install.py --all --build-dir=$build_path
+        python3 $local_repo/install.py $build_mode --build-dir=$build_path
         #删除构建目录
         rm -r $build_path/*
     else
@@ -64,7 +89,7 @@ case "$input" in
         install;;
     "--help")
         echo "Usag ycm_menger --insatll/--update";;
-    "--h")
+    "-h")
         echo "Usag ycm_menger --insatll/--update";;
     *)
         echo "Usag ycm_menger --help/-h";;
