@@ -8,13 +8,13 @@
 input=$1;
 
 #本地仓库目录
-local_repo=~/.vim/bundle/YouCompleteMe
+local_repo=~/.vim/plugged/YouCompleteMe
 #远程仓库目录
 remote_repo=https://github.com/ycm-core/YouCompleteMe.git
 #临时构建目录
 build_path=/tmp/$USER/YouCompleteMe.build
 #构建模式
-build_mod=--clang-completer
+build_mode=--clangd-completer
 
 function install() {
     echo -e "\e[1;32mBegin\e[0m : Start the installation of 'YouCompleteMe'!";
