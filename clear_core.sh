@@ -18,7 +18,8 @@ do
         core_list=`find $PROJECT_RUN/$file/bin -name "*.core" `;
         for core_file in $core_list
         do
-            echo $core_file;
+            rm $core_file;
+            echo "remove : $core_file";
         done
         echo -e "\e[1;32mSuccess\e[0m : Clear $PROJECT_RUN/$file complete!";
     fi
