@@ -15,7 +15,7 @@ for file in $RUN_LIST
 do
     if [ -d $PROJECT_RUN/$file/bin ]
     then
-        rm $PROJECT_RUN/$RUN_LIST/bin/*.core;
+        rm $PROJECT_RUN/$file/bin/*.core;
         echo -e "\e[1;32mSuccess\e[0m : Clear $PROJECT_RUN/$file complete!";
     fi
 done
