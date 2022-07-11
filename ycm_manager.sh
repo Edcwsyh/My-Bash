@@ -13,7 +13,6 @@ local_repo=~/.vim/plugged/YouCompleteMe
 remote_repo=https://github.com/ycm-core/YouCompleteMe.git
 #临时构建目录
 build_path=/tmp/$USER/YouCompleteMe.build
-#构建模式
 build_mode=--clangd-completer
 
 function install() {
